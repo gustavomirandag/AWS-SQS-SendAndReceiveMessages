@@ -6,3 +6,6 @@ https://github.com/gustavomirandag/AWS-SQS-SendAndReceiveMessages/blob/master/sr
 
 ## Don't forgot to...
 Change the ACCESS_KEY, SECRET_KEY, queue name, server endpoint etc.
+
+## Reference
+Amazon Simple Queue Service Documentation: https://docs.aws.amazon.com/sqs/index.html

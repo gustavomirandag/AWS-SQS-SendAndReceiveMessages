@@ -39,7 +39,7 @@ public class SqsService {
         SQSConnectionFactory sqsConnectionFactory = SQSConnectionFactory.builder()
                 .withRegion(Region.getRegion(Regions.CA_CENTRAL_1))
                 .withAWSCredentialsProvider(new StaticCredentialsProvider(
-                        new BasicAWSCredentials("AKIARCTYANEFX365O3LJ","CSPd5R9R79bbjfGxcjnJXxU8ZQG6vcos29gwJNRp")))
+                        new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY)))
                 .build();
         //AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
         SQSConnection sqsConnection = null;

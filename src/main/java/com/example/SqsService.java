@@ -19,7 +19,9 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
+import com.amazonaws.services.sqs.model.SendMessageResult;
 import com.amazonaws.services.sqs.model.SetQueueAttributesRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +39,7 @@ public class SqsService {
         SQSConnectionFactory sqsConnectionFactory = SQSConnectionFactory.builder()
                 .withRegion(Region.getRegion(Regions.CA_CENTRAL_1))
                 .withAWSCredentialsProvider(new StaticCredentialsProvider(
-                        new BasicAWSCredentials(ACCESS_KEY,SECRET_KEY)))
+                        new BasicAWSCredentials("AKIARCTYANEFX365O3LJ","CSPd5R9R79bbjfGxcjnJXxU8ZQG6vcos29gwJNRp")))
                 .build();
         //AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
         SQSConnection sqsConnection = null;
@@ -49,7 +51,7 @@ public class SqsService {
         sqs = sqsConnection.getAmazonSQSClient();
     }
     
-    public void sendSomething(String message){
+    public String sendSomething(String message, String queueName){
 
         //CreateQueueRequest create_request = new CreateQueueRequest("add-product-command-queue")
                 //.addAttributesEntry("DelaySeconds", "60")
@@ -64,27 +66,30 @@ public class SqsService {
         //}
         
         SendMessageRequest send_msg_request = new SendMessageRequest()
-        .withQueueUrl("https://sqs.ca-central-1.amazonaws.com/074339870987/add-product-command-queue")
+        .withQueueUrl("https://sqs.ca-central-1.amazonaws.com/074339870987/" + queueName)
         .withMessageBody(message)
         .withDelaySeconds(5);
-        sqs.sendMessage(send_msg_request);
+        SendMessageResult result = sqs.sendMessage(send_msg_request);
+        return result.getMessageId();
+        
     }
     
-    public void receiveSomething(){
-        
-        List<Message> messages = sqs.receiveMessage("https://sqs.ca-central-1.amazonaws.com/074339870987/add-product-command-queue").getMessages();
-        while(messages!=null){
+    public List<String> receiveSomething(String queueName){
+        List<String> resultMessages = new ArrayList<String>();
+        List<Message> messages = sqs.receiveMessage("https://sqs.ca-central-1.amazonaws.com/074339870987/" + queueName).getMessages();
+        while(messages!=null && !messages.isEmpty()){
             messages.forEach((msg) -> {
                 System.out.println(msg.getBody());
+                resultMessages.add(msg.getBody());
             });
 
             for (Message m : messages) {
-                sqs.deleteMessage("https://sqs.ca-central-1.amazonaws.com/074339870987/add-product-command-queue", m.getReceiptHandle());
+                sqs.deleteMessage("https://sqs.ca-central-1.amazonaws.com/074339870987/" + queueName, m.getReceiptHandle());
             }  
             
-            messages = sqs.receiveMessage("https://sqs.ca-central-1.amazonaws.com/074339870987/add-product-command-queue").getMessages();
+            messages = sqs.receiveMessage("https://sqs.ca-central-1.amazonaws.com/074339870987/" + queueName).getMessages();
         }
-
+        return resultMessages;
     }
     
     public void receiveSomethingWithLongPolling(){
